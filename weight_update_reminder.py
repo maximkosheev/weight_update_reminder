@@ -76,10 +76,15 @@ def main():
             weight_updated_date = (date(1970, 1, 1) + timedelta(days=float(profile['last_weight_date_int'])))
             # проверяем, что сегодня пользователь ещё не обновлял вес
             if weight_updated_date < user_now.date():
-                logger.debug(f"Send notification to user {user['user_id']}")
-                broker_channel.basic_publish("nutriciloid", "scheduled.check_user_weight",
-                                             json.dumps({"user_id": user['user_id']}),
-                                             properties=message_properties)
+                message = {"user_id": user['user_id'], "status": False}
+            else:
+                message = {"user_id": user['user_id'], "status": True}
+
+            logger.debug(f"Send notification to user {user['user_id']}")
+            broker_channel.basic_publish("nutriciloid", "scheduled.check_user_weight",
+                                         json.dumps(message),
+                                         properties=message_properties)
+
         else:
             logger.debug(f"Skip user {user['user_id']}: not a good time to send notification")
 
