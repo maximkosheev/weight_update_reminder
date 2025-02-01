@@ -53,10 +53,10 @@ def main():
     users_to_remind = users.find({"$or": [
         {"remind_weight_send_date": {"$exists": False}},
         {"remind_weight_send_date": None},
-        {"remind_weight_send_date": {"$lt": datetime.today()}}
-    ]})
+        {"remind_weight_send_date": {"$lt": datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)}}
+    ]}).to_list()
 
-    if users_to_remind is None:
+    if len(users_to_remind) == 0:
         logger.info("There is no one user for sending notification")
         return
 
@@ -81,7 +81,7 @@ def main():
                 message = {"user_id": user['user_id'], "status": True}
 
             logger.debug(f"Send notification to user {user['user_id']}")
-            broker_channel.basic_publish("nutriciloid", "scheduled.check_user_weight",
+            broker_channel.basic_publish('', "remind_weight",
                                          json.dumps(message),
                                          properties=message_properties)
 
