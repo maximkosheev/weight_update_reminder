@@ -50,7 +50,7 @@ class FatSecretProfile:
             body = response.json()
             if "error" in body:
                 logger.error(f"FatSecret return error:{body['error']}")
-                raise FatSecretError(f"FatSecret return error with code {body["error"]["code"]}")
+                raise FatSecretError(f"FatSecret return error with code {body['error']['code']}")
             else:
                 return body
         else:
