@@ -60,7 +60,7 @@ def main():
         logger.info("There is no one user for sending notification")
         return
 
-    broker_connection = BlockingConnection(URLParameters(os.getenv("AMQ_URL")))
+    broker_connection = BlockingConnection(URLParameters(os.getenv("RABBITMQ_URI")))
     broker_channel= broker_connection.channel()
     message_properties = BasicProperties(content_type="application/json", content_encoding="utf-8")
 
