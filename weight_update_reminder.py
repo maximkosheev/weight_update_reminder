@@ -40,7 +40,7 @@ def calc_user_notification_interval(instant) -> tuple:
     :return: Кортеж из начала и конца интервала
     """
     start_interval = instant.replace(hour=8, minute=0, second=0, microsecond=0)
-    end_interval = instant.replace(hour=23, minute=59, second=59, microsecond=999)
+    end_interval = instant.replace(hour=21, minute=0, second=0, microsecond=0)
     return start_interval, end_interval
 
 
