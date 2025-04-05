@@ -65,28 +65,28 @@ def main():
     message_properties = BasicProperties(content_type="application/json", content_encoding="utf-8")
 
     for client in clients_to_remind:
-        logger.debug(f"Handle client: {client['user_id']}")
+        logger.debug(f"Handle client: {client['telegram_id']}")
         client_now = calc_client_now(client['timezone_offset'])
         client_notification_interval = calc_client_notification_interval(client_now)
         # проверяем, что в данный момент пользователю можно отправлять уведомление (сейчас у пользователя не ночь)
         if client_notification_interval[0] < client_now < client_notification_interval[1]:
             fat_secret_profile = FatSecretProfile(client['oauth']['access']['token'], client['oauth']['access']['secret'], fat_secret_context)
             profile = fat_secret_profile.get_status()
-            logger.debug(f"client {client['user_id']} status is {profile}")
+            logger.debug(f"client {client['telegram_id']} status is {profile}")
             weight_updated_date = (date(1970, 1, 1) + timedelta(days=float(profile['last_weight_date_int'])))
             # проверяем, что сегодня пользователь ещё не обновлял вес
             if weight_updated_date < client_now.date():
-                message = {"user_id": client['user_id'], "status": False}
+                message = {"telegram_id": client['telegram_id'], "status": False}
             else:
-                message = {"user_id": client['user_id'], "status": True}
+                message = {"telegram_id": client['telegram_id'], "status": True}
 
-            logger.debug(f"Send notification to client {client['user_id']}")
+            logger.debug(f"Send notification to client {client['telegram_id']}")
             broker_channel.basic_publish('', "remind_weight",
                                          json.dumps(message),
                                          properties=message_properties)
 
         else:
-            logger.debug(f"Skip client {client['user_id']}: not a good time to send notification")
+            logger.debug(f"Skip client {client['telegram_id']}: not a good time to send notification")
 
 
 if __name__ == "__main__":
