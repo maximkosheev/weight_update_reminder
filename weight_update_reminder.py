@@ -51,9 +51,9 @@ def main():
     db_client = MongoClient(os.getenv("DATABASE_URI"))
     clients = db_client.nutriciloid.clients
     clients_to_remind = clients.find({"$or": [
-        {"remind_weight_send_date": {"$exists": False}},
-        {"remind_weight_send_date": None},
-        {"remind_weight_send_date": {"$lt": datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)}}
+        {"remind_weight_send_dt": {"$exists": False}},
+        {"remind_weight_send_dt": None},
+        {"remind_weight_send_dt": {"$lt": datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)}}
     ]}).to_list()
 
     if len(clients_to_remind) == 0:
@@ -70,7 +70,9 @@ def main():
         client_notification_interval = calc_client_notification_interval(client_now)
         # проверяем, что в данный момент пользователю можно отправлять уведомление (сейчас у пользователя не ночь)
         if client_notification_interval[0] < client_now < client_notification_interval[1]:
-            fat_secret_profile = FatSecretProfile(client['oauth']['access']['token'], client['oauth']['access']['secret'], fat_secret_context)
+            fat_secret_profile = FatSecretProfile(client['fat_secret_access']['access']['token'],
+                                                  client['fat_secret_access']['access']['secret'],
+                                                  fat_secret_context)
             profile = fat_secret_profile.get_status()
             logger.debug(f"client {client['telegram_id']} status is {profile}")
             weight_updated_date = (date(1970, 1, 1) + timedelta(days=float(profile['last_weight_date_int'])))
